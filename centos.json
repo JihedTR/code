@@ -1,0 +1,54 @@
+{
+  "builders" : [
+    {
+      "type" : "vsphere-iso",
+      "vcenter_server" : "192.168.0.17",
+      "username" : "administrator@phy-cluster.apps.local",
+      "password" : "superpassword",
+      "insecure_connection" : "true",
+      "notes": "Build via Packer",
+      "datacenter" : "APPS",
+      "cluster":"Cluster-Apps",
+      "datastore":"NFS",
+      "network": "Net",
+      "guest_os_type": "centos7_64Guest",
+      "boot_wait":"10s",
+      "boot_order":"disk,cdrom,floppy",
+      "vm_name" : "CENTOS-8.x",
+      "ssh_username": "demo",
+      "ssh_password":"superpassword",
+      "CPUs":"8",
+      "RAM":"8192",
+      "RAM_reserve_all": "false",
+      "convert_to_template": "true",
+      "folder": "Templates-VM",
+      "disk_controller_type":  "pvscsi",
+      "disk_size":"25000",
+      "disk_thin_provisioned": "true",
+      "network_card": "vmxnet3",
+      "iso_paths": [
+        "[NFS] ISO/CentOS8.iso"
+      ],
+      "floppy_files": [
+        "ks.cfg"
+      ],
+      "boot_command": [
+	"<esc><wait>",
+	"linux ks=hd:fd0:/ks.cfg<enter>"
+	] 
+    }
+],
+"provisioners" : [
+  {
+    "type":"shell",
+    "inline":[
+	"touch done.txt"]
+  },
+  {
+    "type":"ansible",
+    "extra_arguments": ["--inventory-file=hosts.ini"],
+    "playbook_file":"site.yml",
+    "user":"demo"
+  }
+]
+}
